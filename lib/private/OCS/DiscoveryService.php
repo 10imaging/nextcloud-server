@@ -103,7 +103,7 @@ class DiscoveryService implements IDiscoveryService {
 		) {
 			foreach ($decodedServices['services'][$service]['endpoints'] as $endpoint => $url) {
 				if($this->isSafeUrl($url)) {
-					$discoveredServices[$endpoint] = $url;
+					$discoveredServices[$endpoint] = $url[0] === '/' ? $url : '/' . $url;
 				}
 			}
 		}

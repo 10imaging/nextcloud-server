@@ -90,6 +90,7 @@ class DiscoveryServiceTest extends TestCase {
 		return [
 			[['services' => ['myService' => ['endpoints' => []]]], 'myService', []],
 			[['services' => ['myService' => ['endpoints' => ['foo' => '/bar']]]], 'myService', ['foo' => '/bar']],
+			[['services' => ['myService' => ['endpoints' => ['foo' => 'bar']]]], 'myService', ['foo' => '/bar']],
 			[['services' => ['myService' => ['endpoints' => ['foo' => '/bar']]]], 'anotherService', []],
 			[['services' => ['myService' => ['endpoints' => ['foo' => '/bar</foo']]]], 'myService', []],
 		];
