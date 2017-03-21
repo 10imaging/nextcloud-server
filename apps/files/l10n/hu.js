@@ -45,7 +45,6 @@ OC.L10N.register(
     "Could not create file \"{file}\" because it already exists" : "{file} fájl nem létrehozható, mert már létezik",
     "Could not create folder \"{dir}\" because it already exists" : "{dir} mappa nem hozható létre, mert már létezik",
     "Error deleting file \"{fileName}\"." : "Hiba történt {fileName} fájl törlése közben.",
-    "No search results in other folders for '{tag}{filter}{endtag}'" : "Ehhez nincsenek keresési eredmények más mappákban: '{tag}{filter}{endtag}'",
     "Name" : "Név",
     "Size" : "Méret",
     "Modified" : "Módosítva",
@@ -174,6 +173,9 @@ OC.L10N.register(
     "%2$s restored %1$s" : "%1$s visszatöltötte %2$s",
     "Changed by %2$s" : "Megváltoztatta: %2$s",
     "Deleted by %2$s" : "Törölte: %2$s",
-    "Restored by %2$s" : "Visszaállította: %2$s"
+    "Restored by %2$s" : "Visszaállította: %2$s",
+    "_{hours}:{minutes}:{seconds} hour left_::_{hours}:{minutes}:{seconds} hours left_" : ["{hours}:{minutes}:{seconds} óra van hátra","{hours}:{minutes}:{seconds} óra van hátra"],
+    "_{minutes}:{seconds} minute left_::_{minutes}:{seconds} minutes left_" : ["{minutes}:{seconds} perc van hátra","{minutes}:{seconds} perc van hátra"],
+    "_{seconds} second left_::_{seconds} seconds left_" : ["{seconds} másodperc van hátra","{seconds} másodperc van hátra"]
 },
 "nplurals=2; plural=(n != 1);");

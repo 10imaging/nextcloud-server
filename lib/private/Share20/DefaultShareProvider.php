@@ -329,6 +329,10 @@ class DefaultShareProvider implements IShareProvider {
 			$group = $this->groupManager->get($share->getSharedWith());
 			$user = $this->userManager->get($recipient);
 
+			if (is_null($group)) {
+				throw new ProviderException('Group "' . $share->getSharedWith() . '" does not exist');
+			}
+
 			if (!$group->inGroup($user)) {
 				throw new ProviderException('Recipient not in receiving group');
 			}
@@ -642,7 +646,8 @@ class DefaultShareProvider implements IShareProvider {
 		// exclude shares leading to trashbin on home storages
 		$pathSections = explode('/', $data['path'], 2);
 		// FIXME: would not detect rare md5'd home storage case properly
-		if ($pathSections[0] !== 'files' && explode(':', $data['storage_string_id'], 2)[0] === 'home') {
+		if ($pathSections[0] !== 'files' 
+		    	&& in_array(explode(':', $data['storage_string_id'], 2)[0], array('home', 'object'))) {
 			return false;
 		}
 		return true;

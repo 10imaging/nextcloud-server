@@ -227,7 +227,7 @@ class Server extends ServerContainer implements IServerContainer {
 			return new \OC\User\Manager($config);
 		});
 		$this->registerService('GroupManager', function (Server $c) {
-			$groupManager = new \OC\Group\Manager($this->getUserManager());
+			$groupManager = new \OC\Group\Manager($this->getUserManager(), $this->getLogger());
 			$groupManager->listen('\OC\Group', 'preCreate', function ($gid) {
 				\OC_Hook::emit('OC_Group', 'pre_createGroup', array('run' => true, 'gid' => $gid));
 			});
@@ -479,12 +479,12 @@ class Server extends ServerContainer implements IServerContainer {
 		});
 		$this->registerService('DatabaseConnection', function (Server $c) {
 			$systemConfig = $c->getSystemConfig();
-			$factory = new \OC\DB\ConnectionFactory($c->getConfig());
+			$factory = new \OC\DB\ConnectionFactory($systemConfig);
 			$type = $systemConfig->getValue('dbtype', 'sqlite');
 			if (!$factory->isValidType($type)) {
 				throw new \OC\DatabaseException('Invalid database type');
 			}
-			$connectionParams = $factory->createConnectionParams($systemConfig);
+			$connectionParams = $factory->createConnectionParams();
 			$connection = $factory->getConnection($type, $connectionParams);
 			$connection->getConfiguration()->setSQLLogger($c->getQueryLogger());
 			return $connection;
@@ -811,6 +811,7 @@ class Server extends ServerContainer implements IServerContainer {
 				$c->getEncryptionManager(),
 				$c->getUserManager(),
 				$c->getLockingProvider(),
+				$c->getRequest(),
 				new \OC\Settings\Mapper($c->getDatabaseConnection()),
 				$c->getURLGenerator()
 			);

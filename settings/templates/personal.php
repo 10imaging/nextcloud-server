@@ -28,8 +28,13 @@
 	<div style="width:<?php p($_['usage_relative']);?>%"
 		<?php if($_['usage_relative'] > 80): ?> class="quota-warning" <?php endif; ?>>
 		<p id="quotatext">
-			<?php print_unescaped($l->t('You are using <strong>%s</strong> of <strong>%s</strong>',
-			array($_['usage'], $_['total_space'])));?>
+			<?php if ($_['quota'] === \OCP\Files\FileInfo::SPACE_UNLIMITED): ?>
+				<?php print_unescaped($l->t('You are using <strong>%s</strong> of <strong>%s</strong>',
+					[$_['usage'], $_['total_space']]));?>
+			<?php else: ?>
+				<?php print_unescaped($l->t('You are using <strong>%s</strong> of <strong>%s</strong> (<strong>%s %%</strong>)',
+					[$_['usage'], $_['total_space'],  $_['usage_relative']]));?>
+			<?php endif ?>
 		</p>
 	</div>
 </div>
@@ -76,7 +81,7 @@
 			<input type="text" id="displayname" name="displayname"
 				<?php if(!$_['displayNameChangeSupported']) { print_unescaped('class="hidden"'); } ?>
 				value="<?php p($_['displayName']) ?>"
-				autocomplete="on" autocapitalize="off" autocorrect="off" />
+				autocomplete="on" autocapitalize="none" autocorrect="off" />
 			<?php if(!$_['displayNameChangeSupported']) { ?>
 				<span><?php if(isset($_['displayName']) && !empty($_['displayName'])) { p($_['displayName']); } else { p($l->t('No display name set')); } ?></span>
 			<?php } ?>
@@ -93,7 +98,7 @@
 			<input type="email" name="email" id="email" value="<?php p($_['email']); ?>"
 				<?php if(!$_['displayNameChangeSupported']) { print_unescaped('class="hidden"'); } ?>
 				placeholder="<?php p($l->t('Your email address')); ?>"
-				autocomplete="on" autocapitalize="off" autocorrect="off" />
+				autocomplete="on" autocapitalize="none" autocorrect="off" />
 			<?php if(!$_['displayNameChangeSupported']) { ?>
 				<span><?php if(isset($_['email']) && !empty($_['email'])) { p($_['email']); } else { p($l->t('No email address set')); }?></span>
 			<?php } ?>
@@ -114,7 +119,7 @@
 			<input type="tel" id="phone" name="phone"
 			       value="<?php p($_['phone']) ?>"
 				   placeholder="<?php p($l->t('Your phone number')); ?>"
-			       autocomplete="on" autocapitalize="off" autocorrect="off" />
+			       autocomplete="on" autocapitalize="none" autocorrect="off" />
 			<span class="icon-checkmark hidden"/>
 			<input type="hidden" id="phonescope" value="<?php p($_['phoneScope']) ?>">
 		</form>
@@ -128,7 +133,7 @@
 			<input type="text" id="address" name="address"
 				   placeholder="<?php p($l->t('Your postal address')); ?>"
 				   value="<?php p($_['address']) ?>"
-				   autocomplete="on" autocapitalize="off" autocorrect="off" />
+				   autocomplete="on" autocapitalize="none" autocorrect="off" />
 			<span class="icon-checkmark hidden"/>
 			<input type="hidden" id="addressscope" value="<?php p($_['addressScope']) ?>">
 		</form>
@@ -141,7 +146,7 @@
 			</h2>
 			<input type="text" name="website" id="website" value="<?php p($_['website']); ?>"
 			       placeholder="<?php p($l->t('Your website')); ?>"
-			       autocomplete="on" autocapitalize="off" autocorrect="off" />
+			       autocomplete="on" autocapitalize="none" autocorrect="off" />
 			<span class="icon-checkmark hidden"/>
 			<input type="hidden" id="websitescope" value="<?php p($_['websiteScope']) ?>">
 		</form>
@@ -154,7 +159,7 @@
 			</h2>
 			<input type="text" name="twitter" id="twitter" value="<?php p($_['twitter']); ?>"
 				   placeholder="<?php p($l->t('Your Twitter handle')); ?>"
-				   autocomplete="on" autocapitalize="off" autocorrect="off" />
+				   autocomplete="on" autocapitalize="none" autocorrect="off" />
 			<span class="icon-checkmark hidden"/>
 			<input type="hidden" id="twitterscope" value="<?php p($_['twitterScope']) ?>">
 		</form>
@@ -183,13 +188,13 @@ if($_['passwordChangeSupported']) {
 	<label for="pass1" class="hidden-visually"><?php p($l->t('Current password')); ?>: </label>
 	<input type="password" id="pass1" name="oldpassword"
 		placeholder="<?php p($l->t('Current password'));?>"
-		autocomplete="off" autocapitalize="off" autocorrect="off" />
+		autocomplete="off" autocapitalize="none" autocorrect="off" />
 	<div class="personal-show-container">
 		<label for="pass2" class="hidden-visually"><?php p($l->t('New password'));?>: </label>
 		<input type="password" id="pass2" name="newpassword"
 			placeholder="<?php p($l->t('New password')); ?>"
 			data-typetoggle="#personal-show"
-			autocomplete="off" autocapitalize="off" autocorrect="off" />
+			autocomplete="off" autocapitalize="none" autocorrect="off" />
 		<input type="checkbox" id="personal-show" name="show" /><label for="personal-show" class="personal-show-label"></label>
 	</div>
 	<input id="passwordbutton" type="submit" value="<?php p($l->t('Change password')); ?>" />

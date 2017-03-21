@@ -225,6 +225,14 @@ var OCP = {},
 	},
 
 	/**
+	 * Check if a user file is allowed to be handled.
+	 * @param {string} file to check
+	 */
+	fileIsBlacklisted: function(file) {
+		return !!(file.match(oc_config.blacklist_files_regex));
+	},
+
+	/**
 	 * Redirect to the target URL, can also be used for downloads.
 	 * @param {string} targetURL URL to redirect to
 	 */
@@ -1265,6 +1273,15 @@ function initCore() {
 	});
 
 	/**
+	 * Disable execution of eval in jQuery. We do require an allowed eval CSP
+	 * configuration at the moment for handlebars et al. But for jQuery there is
+	 * not much of a reason to execute JavaScript directly via eval.
+	 *
+	 * This thus mitigates some unexpected XSS vectors.
+	 */
+	jQuery.globalEval = function(){};
+
+	/**
 	 * Set users locale to moment.js as soon as possible
 	 */
 	moment.locale(OC.getLocale());
@@ -1369,6 +1386,10 @@ function initCore() {
 	 * If the screen is bigger, the main menu is not a toggle any more.
 	 */
 	function setupMainMenu() {
+
+		// init the more-apps menu
+		OC.registerMenu($('#more-apps'), $('#navigation'));
+
 		// toggle the navigation
 		var $toggle = $('#header .header-appname-container');
 		var $navigation = $('#navigation');
@@ -1438,13 +1459,20 @@ function initCore() {
 	// move triangle of apps dropdown to align with app name triangle
 	// 2 is the additional offset between the triangles
 	if($('#navigation').length) {
-		$('#header #nextcloud + .menutoggle').one('click', function(){
+		$('#header #nextcloud + .menutoggle').on('click', function(){
+			$('#menu-css-helper').remove();
 			var caretPosition = $('.header-appname + .icon-caret').offset().left - 2;
 			if(caretPosition > 255) {
 				// if the app name is longer than the menu, just put the triangle in the middle
 				return;
 			} else {
-				$('head').append('<style>#navigation:after { left: '+ caretPosition +'px; }</style>');
+				$('head').append('<style id="menu-css-helper">#navigation:after { left: '+ caretPosition +'px; }</style>');
+			}
+		});
+		$('#header #appmenu .menutoggle').on('click', function() {
+			$('#appmenu').toggleClass('menu-open');
+			if($('#appmenu').is(':visible')) {
+				$('#menu-css-helper').remove();
 			}
 		});
 	}

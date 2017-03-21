@@ -37,6 +37,7 @@ use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Application {
@@ -97,7 +98,8 @@ class Application {
 					throw new NeedsUpdateException();
 				} elseif ($this->config->getSystemValue('maintenance', false)) {
 					if ($input->getArgument('command') !== '_completion') {
-						$output->writeln("Nextcloud is in maintenance mode - no apps have been loaded");
+						$errOutput = $output->getErrorOutput();
+						$errOutput->writeln('<comment>Nextcloud is in maintenance mode - no app have been loaded</comment>' . PHP_EOL);
 					}
 				} else {
 					OC_App::loadApps();
@@ -134,7 +136,7 @@ class Application {
 		}
 
 		if ($input->getFirstArgument() !== 'check') {
-			$errors = \OC_Util::checkServer(\OC::$server->getConfig());
+			$errors = \OC_Util::checkServer(\OC::$server->getSystemConfig());
 			if (!empty($errors)) {
 				foreach ($errors as $error) {
 					$output->writeln((string)$error['error']);

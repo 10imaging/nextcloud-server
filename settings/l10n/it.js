@@ -333,7 +333,7 @@ OC.L10N.register(
     "Default quota" : "Quota predefinita",
     "Please enter storage quota (ex: \"512 MB\" or \"12 GB\")" : "Digita la quota di archiviazione (ad es.: \"512 MB\" or \"12 GB\")",
     "Other" : "Altro",
-    "Group admin for" : "Gruppo di amministrazione per",
+    "Group admin for" : "Amministratore per il gruppo",
     "Quota" : "Quote",
     "Storage location" : "Posizione di archiviazione",
     "User backend" : "Motore utente",
@@ -377,7 +377,7 @@ OC.L10N.register(
     "Group" : "Gruppo",
     "Default Quota" : "Quota predefinita",
     "Full Name" : "Nome completo",
-    "Group Admin for" : "Gruppo di amministrazione per",
+    "Group Admin for" : "Amministratore per il gruppo",
     "Storage Location" : "Posizione di archiviazione",
     "User Backend" : "Motore utente",
     "Last Login" : "Ultimo accesso"

@@ -1,6 +1,7 @@
-<?php
 /**
- * @copyright Copyright (c) 2016 Joas Schilling <coding@schilljs.com>
+ * @copyright 2017, Roeland Jago Douma <roeland@famdouma.nl>
+ *
+ * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -19,19 +20,34 @@
  *
  */
 
-namespace Test;
-
-/**
- * FIXME Remove this once phpunit 5 is the lowest supported version, by reverting:
- * https://github.com/nextcloud/server/pull/2137
- */
-abstract class TestCasePhpUnit5 extends \PHPUnit_Framework_TestCase {
-
-	abstract protected function realOnNotSuccessfulTest();
-
-	protected function onNotSuccessfulTest($e) {
-		$this->realOnNotSuccessfulTest();
-
-		parent::onNotSuccessfulTest($e);
+(function() {
+	if (!OC.Share) {
+		OC.Share = {};
 	}
-}
+
+	OC.Share.Social = {};
+
+	var SocialModel = OC.Backbone.Model.extend({
+		defaults: {
+			/** used for sorting social buttons */
+			key: null,
+			/** url to open, {{reference}} will be replaced with the link */
+			url: null,
+			/** Name to show in the tooltip */
+			name: null,
+			/** Icon class to display */
+			iconClass: null
+		}
+	});
+
+	OC.Share.Social.Model = SocialModel;
+
+	var SocialCollection = OC.Backbone.Collection.extend({
+		model: OC.Share.Social.Model,
+
+		comparator: 'key'
+	});
+
+
+	OC.Share.Social.Collection = new SocialCollection;
+})();

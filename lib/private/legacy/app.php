@@ -134,10 +134,8 @@ class OC_App {
 	 * load a single app
 	 *
 	 * @param string $app
-	 * @param bool $checkUpgrade whether an upgrade check should be done
-	 * @throws \OC\NeedsUpdateException
 	 */
-	public static function loadApp($app, $checkUpgrade = true) {
+	public static function loadApp($app) {
 		self::$loadedApps[] = $app;
 		$appPath = self::getAppPath($app);
 		if($appPath === false) {
@@ -149,9 +147,6 @@ class OC_App {
 
 		if (is_file($appPath . '/appinfo/app.php')) {
 			\OC::$server->getEventLogger()->start('load_app_' . $app, 'Load app: ' . $app);
-			if ($checkUpgrade and self::shouldUpgrade($app)) {
-				throw new \OC\NeedsUpdateException();
-			}
 			self::requireAppFile($app);
 			if (self::isType($app, array('authentication'))) {
 				// since authentication apps affect the "is app enabled for group" check,
@@ -534,16 +529,10 @@ class OC_App {
 
 	// This is private as well. It simply works, so don't ask for more details
 	private static function proceedNavigation($list) {
-		$activeApp = OC::$server->getNavigationManager()->getActiveEntry();
-		foreach ($list as &$navEntry) {
-			if ($navEntry['id'] == $activeApp) {
-				$navEntry['active'] = true;
-			} else {
-				$navEntry['active'] = false;
-			}
+		$headerIconCount = 8;
+		if(OC_User::isAdminUser(OC_User::getUser())) {
+			$headerIconCount--;
 		}
-		unset($navEntry);
-
 		usort($list, function($a, $b) {
 			if (isset($a['order']) && isset($b['order'])) {
 				return ($a['order'] < $b['order']) ? -1 : 1;
@@ -553,6 +542,63 @@ class OC_App {
 				return ($a['name'] < $b['name']) ? -1 : 1;
 			}
 		});
+
+		$activeAppIndex = -1;
+		$activeApp = OC::$server->getNavigationManager()->getActiveEntry();
+		foreach ($list as $index => &$navEntry) {
+			if ($navEntry['id'] == $activeApp) {
+				$navEntry['active'] = true;
+				$activeAppIndex = $index;
+			} else {
+				$navEntry['active'] = false;
+			}
+		}
+		unset($navEntry);
+
+		if($activeAppIndex > ($headerIconCount-1)) {
+			$active = $list[$activeAppIndex];
+			$lastInHeader = $list[$headerIconCount-1];
+			$list[$headerIconCount-1] = $active;
+			$list[$activeAppIndex] = $lastInHeader;
+		}
+
+		foreach ($list as $index => &$navEntry) {
+			$navEntry['showInHeader'] = false;
+			if($index < $headerIconCount) {
+				$navEntry['showInHeader'] = true;
+			}
+		}
+
+
+
+		return $list;
+	}
+
+	public static function proceedAppNavigation($entries) {
+		$headerIconCount = 8;
+		if(OC_User::isAdminUser(OC_User::getUser())) {
+			$headerIconCount--;
+		}
+		$activeAppIndex = -1;
+		$list = self::proceedNavigation($entries);
+
+		$activeApp = OC::$server->getNavigationManager()->getActiveEntry();
+		foreach ($list as $index => &$navEntry) {
+			if ($navEntry['id'] == $activeApp) {
+				$navEntry['active'] = true;
+				$activeAppIndex = $index;
+			} else {
+				$navEntry['active'] = false;
+			}
+		}
+		// move active item to last position
+		if($activeAppIndex > ($headerIconCount-1)) {
+			$active = $list[$activeAppIndex];
+			$lastInHeader = $list[$headerIconCount-1];
+			$list[$headerIconCount-1] = $active;
+			$list[$activeAppIndex] = $lastInHeader;
+		}
+		$list = array_slice($list, 0, $headerIconCount);
 
 		return $list;
 	}
@@ -743,6 +789,22 @@ class OC_App {
 	public static function getNavigation() {
 		$entries = OC::$server->getNavigationManager()->getAll();
 		$navigation = self::proceedNavigation($entries);
+		return $navigation;
+	}
+
+	/**
+	 * Returns the navigation inside the header bar
+	 *
+	 * @return array
+	 *
+	 * This function returns an array containing all entries added. The
+	 * entries are sorted by the key 'order' ascending. Additional to the keys
+	 * given for each app the following keys exist:
+	 *   - active: boolean, signals if the user is on this navigation entry
+	 */
+	public static function getHeaderNavigation() {
+		$entries = OC::$server->getNavigationManager()->getAll();
+		$navigation = self::proceedAppNavigation($entries);
 		return $navigation;
 	}
 
@@ -1138,7 +1200,7 @@ class OC_App {
 		unset(self::$appVersion[$appId]);
 		// run upgrade code
 		if (file_exists($appPath . '/appinfo/update.php')) {
-			self::loadApp($appId, false);
+			self::loadApp($appId);
 			include $appPath . '/appinfo/update.php';
 		}
 		self::setupBackgroundJobs($appData['background-jobs']);
@@ -1183,7 +1245,7 @@ class OC_App {
 			return;
 		}
 		// load the app
-		self::loadApp($appId, false);
+		self::loadApp($appId);
 
 		$dispatcher = OC::$server->getEventDispatcher();
 
